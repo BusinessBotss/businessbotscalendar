@@ -1,415 +1,1014 @@
 <!DOCTYPE html>
 <html lang="es">
 <head>
-  <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>Calendario Semanal — Agencia IA</title>
-  <style>
-    :root{
-      --bg:#0b0b0f;          /* fondo negro profundo */
-      --ink:#F5F7FA;         /* texto blanco suave */
-      --muted:#9aa4ad;
-      --grid:#1b1f2a;        /* líneas sutiles */
-      --card:#12131a;
-      --accent:#42f5b9;
-      --radius:16px;
-      --shadow:0 10px 30px rgba(0,0,0,.45);
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Calendario Semanal IA - Bunyola</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
 
-      /* Gradientes neón */
-      --grad-work: linear-gradient(135deg,#ff3d7f,#ff9a44);
-      --grad-gym:  linear-gradient(135deg,#00E2FF,#00FFA3);
-      --grad-free: linear-gradient(135deg,#8A64FF,#00E5FF);
-      --grad-study:linear-gradient(135deg,#FFC857,#FF3CAC);
-      --grad-sleep:linear-gradient(135deg,#4b5bff,#1e1e6a);
-      --grad-meal: linear-gradient(135deg,#FFE53B,#FF2525);
-      --grad-clean:linear-gradient(135deg,#7CF4FF,#38BDF8);
-    }
-    *{box-sizing:border-box}
-    html,body{height:100%}
-    body{margin:0;background:var(--bg);color:var(--ink);font:15px/1.4 system-ui,Segoe UI,Roboto,Inter,sans-serif}
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: #0b0b0f;
+            color: #F5F7FA;
+            overflow-x: auto;
+            min-height: 100vh;
+        }
 
-    /* Login */
-    #gate{position:fixed;inset:0;display:flex;align-items:center;justify-content:center;background:radial-gradient(60% 60% at 50% 40%,#11121a 0%,#0b0b0f 60%,#0b0b0f 100%);z-index:99}
-    .card{background:var(--card);padding:28px;border-radius:var(--radius);box-shadow:var(--shadow);width:min(420px,92vw);border:1px solid #202437}
-    .title{font-weight:700;font-size:20px;margin:0 0 8px}
-    .sub{margin:0 0 18px;color:var(--muted)}
-    .row{display:flex;gap:10px}
-    input[type=password]{flex:1;background:#0e1118;border:1px solid #24283b;color:var(--ink);border-radius:12px;padding:12px}
-    .btn{border:0;padding:12px 14px;border-radius:14px;color:#0a0a0a;font-weight:700;cursor:pointer;box-shadow:0 0 24px rgba(66,245,185,.35), inset 0 0 1px rgba(255,255,255,.4);}
-    .btn-neon{background:linear-gradient(135deg,#00FFA3,#00E2FF)}
-    .hint{margin-top:10px;color:#ea6a6a;min-height:18px}
+        /* Gate de acceso */
+        .access-gate {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(11, 11, 15, 0.95);
+            backdrop-filter: blur(10px);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 1000;
+        }
 
-    /* App Shell */
-    header{display:flex;align-items:center;justify-content:space-between;gap:14px;padding:16px 18px;background:#0d0f16;border-bottom:1px solid #1d2233;position:sticky;top:0;z-index:3}
-    .stack{display:flex;gap:10px;flex-wrap:wrap}
-    .chip{padding:9px 12px;border-radius:999px;background:#111422;border:1px solid #20283f;color:var(--ink)}
+        .access-form {
+            background: linear-gradient(135deg, #1a1a2e, #16213e);
+            padding: 40px;
+            border-radius: 20px;
+            box-shadow: 0 20px 40px rgba(0, 255, 255, 0.1);
+            text-align: center;
+            border: 1px solid rgba(0, 255, 255, 0.2);
+        }
 
-    /* Botones rápidos (neón) */
-    .quick{display:flex;gap:10px;flex-wrap:wrap}
-    .qbtn{border:0;padding:10px 12px;border-radius:14px;color:#0a0a0a;font-weight:700;cursor:pointer;box-shadow:0 0 22px rgba(0,0,0,.25)}
-    .qbtn span{filter:drop-shadow(0 0 8px rgba(255,255,255,.15))}
-    .q-work{background:var(--grad-work)}
-    .q-gym{background:var(--grad-gym)}
-    .q-free{background:var(--grad-free)}
-    .q-study{background:var(--grad-study)}
-    .q-sleep{background:var(--grad-sleep);color:#cfd8ff}
-    .q-meal{background:var(--grad-meal)}
-    .q-clean{background:var(--grad-clean)}
+        .access-form h2 {
+            margin-bottom: 20px;
+            background: linear-gradient(45deg, #00ffff, #ff00ff);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
 
-    main{padding:16px;display:grid;gap:16px}
+        .access-input {
+            width: 100%;
+            padding: 15px;
+            margin: 10px 0;
+            background: rgba(255, 255, 255, 0.1);
+            border: 1px solid rgba(0, 255, 255, 0.3);
+            border-radius: 10px;
+            color: #F5F7FA;
+            font-size: 16px;
+        }
 
-    /* Calendario */
-    .grid-wrap{background:var(--card);border-radius:18px;border:1px solid #1e2436;box-shadow:var(--shadow);overflow:hidden}
-    .calendar{display:grid;grid-template-columns:80px repeat(7,1fr);}
-    .cal-head{display:contents}
-    .cal-head div{padding:12px 10px;border-bottom:1px solid #252a3e;background:#101423}
-    .cal-head .h{font-weight:700}
-    .cal-head .muted{color:#94a3b8;font-weight:600}
+        .access-btn {
+            width: 100%;
+            padding: 15px;
+            background: linear-gradient(45deg, #00ffff, #ff00ff);
+            border: none;
+            border-radius: 10px;
+            color: white;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
 
-    .times{display:grid;grid-auto-rows:56px}
-    .times div{padding:6px 8px;border-top:1px dashed #23283b;color:#6b7280}
+        .access-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 20px rgba(0, 255, 255, 0.3);
+        }
 
-    .cols{display:grid;grid-template-columns:repeat(7,1fr)}
-    .col{display:grid;grid-auto-rows:56px;border-left:1px solid #1d2233}
-    .cell{border-top:1px solid #141928;position:relative}
+        /* Header */
+        .header {
+            padding: 20px;
+            background: linear-gradient(135deg, #1a1a2e, #16213e);
+            border-bottom: 1px solid rgba(0, 255, 255, 0.2);
+        }
 
-    /* Contenedor de eventos en grid absoluto */
-    .events{display:grid;grid-template-columns:repeat(7,1fr);grid-auto-rows:56px;position:relative}
+        .week-navigation {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 15px;
+            gap: 20px;
+        }
 
-    .event{position:relative;border-radius:12px;padding:8px 10px;margin:4px;color:#0c0c0c;font-weight:700;user-select:none;border:1px solid rgba(255,255,255,.15);box-shadow:0 10px 22px rgba(0,0,0,.35);display:flex;align-items:center;justify-content:space-between;gap:8px}
-    .event .label{background:rgba(255,255,255,.15);padding:2px 8px;border-radius:999px;color:#111}
-    .event small{font-weight:600;color:#111}
-    .event .title{color:#0a0a0a}
-    .event[data-type="work"] {background:var(--grad-work)}
-    .event[data-type="gym"]  {background:var(--grad-gym)}
-    .event[data-type="free"] {background:var(--grad-free)}
-    .event[data-type="study"]{background:var(--grad-study)}
-    .event[data-type="sleep"]{background:var(--grad-sleep)}
-    .event[data-type="meal"] {background:var(--grad-meal)}
-    .event[data-type="clean"]{background:var(--grad-clean)}
+        .nav-btn {
+            padding: 10px 20px;
+            background: linear-gradient(45deg, #00ffff, #ff00ff);
+            border: none;
+            border-radius: 10px;
+            color: white;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-size: 14px;
+        }
 
-    .toolbar{display:flex;gap:10px;flex-wrap:wrap}
-    .ghost{opacity:.6;outline:2px dashed #3b82f6}
+        .nav-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 20px rgba(0, 255, 255, 0.3);
+        }
 
-    /* Modal */
-    dialog{border:1px solid #2a3045;border-radius:18px;background:#0e1118;color:var(--ink);box-shadow:var(--shadow);width:min(520px,92vw)}
-    dialog::backdrop{background:rgba(0,0,0,.55)}
-    .modal-head{display:flex;justify-content:space-between;align-items:center;padding-bottom:6px;border-bottom:1px solid #20263a;margin-bottom:12px}
-    .modal-actions{display:flex;justify-content:flex-end;gap:10px;margin-top:14px}
-    .select, .text, .number, .time{width:100%;padding:10px;border-radius:12px;border:1px solid #23283b;background:#0b0e15;color:var(--ink)}
-    .row2{display:grid;grid-template-columns:1fr 1fr;gap:10px}
-    .btn-ghost{background:#121524;color:#d1d5db;border:1px solid #2a3148;border-radius:14px;padding:10px 12px}
-    .btn-danger{background:#ff6b6b;color:#0a0a0a;border:0;padding:10px 12px;border-radius:14px;font-weight:700}
+        .week-title {
+            font-size: 24px;
+            font-weight: bold;
+            background: linear-gradient(45deg, #00ffff, #ff00ff);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            text-align: center;
+            flex: 1;
+        }
 
-    footer{padding:12px 16px;color:#94a3b8}
-    a{color:#86efac}
-    .sr{position:absolute;left:-9999px}
-  </style>
+        .quick-buttons {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+            margin-bottom: 15px;
+        }
+
+        .quick-btn {
+            padding: 8px 16px;
+            border: none;
+            border-radius: 12px;
+            font-size: 12px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            animation: glow-pulse 2s infinite;
+        }
+
+        @keyframes glow-pulse {
+            0%, 100% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+        }
+
+        .quick-btn.work {
+            background: linear-gradient(45deg, #ff6b6b, #ee5a24);
+            background-size: 200% 200%;
+        }
+
+        .quick-btn.gym {
+            background: linear-gradient(45deg, #4834d4, #686de0);
+            background-size: 200% 200%;
+        }
+
+        .quick-btn.study {
+            background: linear-gradient(45deg, #00d2d3, #01a3a4);
+            background-size: 200% 200%;
+        }
+
+        .quick-btn.meal {
+            background: linear-gradient(45deg, #ff9ff3, #f368e0);
+            background-size: 200% 200%;
+        }
+
+        .quick-btn.sleep {
+            background: linear-gradient(45deg, #3742fa, #2f3542);
+            background-size: 200% 200%;
+        }
+
+        .quick-btn.clean {
+            background: linear-gradient(45deg, #7bed9f, #5f27cd);
+            background-size: 200% 200%;
+        }
+
+        .quick-btn.free {
+            background: linear-gradient(45deg, #ffa502, #ff6348);
+            background-size: 200% 200%;
+        }
+
+        .quick-btn.audio {
+            background: linear-gradient(45deg, #ff3838, #ff6b35);
+            background-size: 200% 200%;
+        }
+
+        .quick-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 20px rgba(255, 255, 255, 0.2);
+        }
+
+        .info-chips {
+            display: flex;
+            gap: 15px;
+            font-size: 14px;
+        }
+
+        .chip {
+            padding: 5px 12px;
+            background: rgba(0, 255, 255, 0.1);
+            border: 1px solid rgba(0, 255, 255, 0.3);
+            border-radius: 20px;
+        }
+
+        /* Calendario */
+        .calendar-container {
+            padding: 20px;
+            overflow-x: auto;
+            min-width: 800px;
+        }
+
+        .calendar {
+            display: grid;
+            grid-template-columns: 80px repeat(7, 1fr);
+            grid-template-rows: 40px repeat(17, 56px);
+            gap: 1px;
+            background: rgba(0, 255, 255, 0.1);
+            border-radius: 12px;
+            overflow: hidden;
+            position: relative;
+        }
+
+        .time-header, .day-header {
+            background: linear-gradient(135deg, #1a1a2e, #16213e);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            font-size: 14px;
+        }
+
+        .time-slot, .day-cell {
+            background: rgba(11, 11, 15, 0.8);
+            border: 1px solid rgba(255, 255, 255, 0.05);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 12px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            position: relative;
+        }
+
+        .day-cell:hover {
+            background: rgba(0, 255, 255, 0.1);
+        }
+
+        .time-slot {
+            font-weight: bold;
+            color: rgba(245, 247, 250, 0.7);
+        }
+
+        /* Eventos */
+        .events {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            display: grid;
+            grid-template-columns: 80px repeat(7, 1fr);
+            grid-template-rows: 40px repeat(17, 56px);
+            gap: 1px;
+        }
+
+        .event {
+            pointer-events: all;
+            border-radius: 12px;
+            padding: 8px;
+            margin: 2px;
+            cursor: move;
+            font-size: 11px;
+            font-weight: bold;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            transition: all 0.3s ease;
+            box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.2);
+        }
+
+        .event:hover {
+            transform: scale(1.02);
+            filter: saturate(1.2);
+            box-shadow: 0 8px 25px rgba(255, 255, 255, 0.15);
+        }
+
+        .event.work {
+            background: linear-gradient(135deg, #ff6b6b, #ee5a24);
+            box-shadow: 0 0 20px rgba(255, 107, 107, 0.3);
+        }
+
+        .event.gym {
+            background: linear-gradient(135deg, #4834d4, #686de0);
+            box-shadow: 0 0 20px rgba(72, 52, 212, 0.3);
+        }
+
+        .event.study {
+            background: linear-gradient(135deg, #00d2d3, #01a3a4);
+            box-shadow: 0 0 20px rgba(0, 210, 211, 0.3);
+        }
+
+        .event.meal {
+            background: linear-gradient(135deg, #ff9ff3, #f368e0);
+            box-shadow: 0 0 20px rgba(255, 159, 243, 0.3);
+        }
+
+        .event.sleep {
+            background: linear-gradient(135deg, #3742fa, #2f3542);
+            box-shadow: 0 0 20px rgba(55, 66, 250, 0.3);
+        }
+
+        .event.clean {
+            background: linear-gradient(135deg, #7bed9f, #5f27cd);
+            box-shadow: 0 0 20px rgba(123, 237, 159, 0.3);
+        }
+
+        .event.free {
+            background: linear-gradient(135deg, #ffa502, #ff6348);
+            box-shadow: 0 0 20px rgba(255, 165, 2, 0.3);
+        }
+
+        .event.audio {
+            background: linear-gradient(135deg, #ff3838, #ff6b35);
+            box-shadow: 0 0 20px rgba(255, 56, 56, 0.3);
+        }
+
+        .event-title {
+            font-weight: bold;
+            margin-bottom: 2px;
+        }
+
+        .event-time {
+            font-size: 10px;
+            opacity: 0.9;
+        }
+
+        /* Modal */
+        .modal {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.8);
+            backdrop-filter: blur(5px);
+            display: none;
+            align-items: center;
+            justify-content: center;
+            z-index: 500;
+            animation: fade-in 0.3s ease;
+        }
+
+        @keyframes fade-in {
+            from {
+                opacity: 0;
+                transform: scale(0.95);
+            }
+            to {
+                opacity: 1;
+                transform: scale(1);
+            }
+        }
+
+        .modal-content {
+            background: linear-gradient(135deg, #1a1a2e, #16213e);
+            padding: 30px;
+            border-radius: 20px;
+            box-shadow: 0 20px 40px rgba(0, 255, 255, 0.2);
+            border: 1px solid rgba(0, 255, 255, 0.3);
+            min-width: 400px;
+            max-width: 90vw;
+        }
+
+        .modal h3 {
+            margin-bottom: 20px;
+            background: linear-gradient(45deg, #00ffff, #ff00ff);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .form-group {
+            margin-bottom: 15px;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: bold;
+        }
+
+        .form-group input, .form-group select {
+            width: 100%;
+            padding: 12px;
+            background: rgba(255, 255, 255, 0.1);
+            border: 1px solid rgba(0, 255, 255, 0.3);
+            border-radius: 8px;
+            color: #F5F7FA;
+            font-size: 14px;
+        }
+
+        .form-group select option {
+            background: #1a1a2e;
+            color: #F5F7FA;
+        }
+
+        .modal-buttons {
+            display: flex;
+            gap: 10px;
+            justify-content: flex-end;
+            margin-top: 20px;
+        }
+
+        .btn {
+            padding: 12px 24px;
+            border: none;
+            border-radius: 8px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .btn-primary {
+            background: linear-gradient(45deg, #00ffff, #ff00ff);
+            color: white;
+        }
+
+        .btn-secondary {
+            background: rgba(255, 255, 255, 0.1);
+            color: #F5F7FA;
+            border: 1px solid rgba(255, 255, 255, 0.3);
+        }
+
+        .btn-danger {
+            background: linear-gradient(45deg, #ff6b6b, #ee5a24);
+            color: white;
+        }
+
+        .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 15px rgba(255, 255, 255, 0.2);
+        }
+
+        /* Tooltip */
+        .tooltip {
+            position: absolute;
+            background: rgba(0, 0, 0, 0.9);
+            color: white;
+            padding: 8px 12px;
+            border-radius: 6px;
+            font-size: 12px;
+            pointer-events: none;
+            z-index: 1000;
+            opacity: 0;
+            transition: opacity 0.3s ease;
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .calendar-container {
+                padding: 10px;
+                min-width: 100%;
+            }
+            
+            .quick-buttons {
+                justify-content: center;
+            }
+            
+            .modal-content {
+                min-width: 90vw;
+                padding: 20px;
+            }
+        }
+
+        .hidden {
+            display: none !important;
+        }
+    </style>
 </head>
 <body>
-  <!-- Gate -->
-  <section id="gate" aria-labelledby="gtitle">
-    <div class="card">
-      <h1 id="gtitle" class="title">Calendario semanal — Acceso</h1>
-      <p class="sub">Introduce la contraseña para entrar.</p>
-      <div class="row">
-        <input id="pwd" type="password" placeholder="Contraseña" autocomplete="current-password" />
-        <button id="enter" class="btn btn-neon">Entrar</button>
-      </div>
-      <div id="hint" class="hint" aria-live="polite"></div>
-      <p class="sub" style="margin-top:12px">Consejo: se guarda automáticamente en este navegador.</p>
-    </div>
-  </section>
-
-  <!-- App -->
-  <header>
-    <div class="stack">
-      <div class="chip">Calendario — Dueño Agencia IA</div>
-      <div class="chip" id="weekLabel">Semana actual</div>
-    </div>
-    <div class="toolbar">
-      <button class="qbtn q-work" data-quick="work"><span>+ Trabajo/Reunión IA</span></button>
-      <button class="qbtn q-gym"  data-quick="gym"><span>+ Gimnasio</span></button>
-      <button class="qbtn q-study"data-quick="study"><span>+ Estudio</span></button>
-      <button class="qbtn q-meal" data-quick="meal"><span>+ Meal Prep</span></button>
-      <button class="qbtn q-clean"data-quick="clean"><span>+ Organización</span></button>
-      <button class="qbtn q-free" data-quick="free"><span>+ Tiempo Libre</span></button>
-      <button class="qbtn q-sleep"data-quick="sleep"><span>+ Sueño</span></button>
-    </div>
-  </header>
-
-  <main>
-    <section class="grid-wrap" aria-label="Calendario semanal">
-      <div class="calendar">
-        <div class="cal-head">
-          <div class="muted">Hora</div>
-          <div class="h">Lunes</div>
-          <div class="h">Martes</div>
-          <div class="h">Miércoles</div>
-          <div class="h">Jueves</div>
-          <div class="h">Viernes</div>
-          <div class="h">Sábado</div>
-          <div class="h">Domingo</div>
+    <!-- Gate de acceso -->
+    <div class="access-gate" id="accessGate">
+        <div class="access-form">
+            <h2>🔐 Acceso Calendario IA</h2>
+            <input type="password" class="access-input" id="passwordInput" placeholder="Contraseña de acceso">
+            <button class="access-btn" onclick="checkAccess()">Acceder</button>
         </div>
-        <div class="times" id="times"></div>
-        <div class="cols" id="cols"></div>
-      </div>
-      <div class="events" id="events" aria-live="polite"></div>
-    </section>
+    </div>
 
-    <section class="stack">
-      <button id="export" class="btn btn-neon">Exportar JSON</button>
-      <button id="clear" class="btn-ghost">Limpiar semana</button>
-    </section>
-  </main>
+    <!-- Aplicación principal -->
+    <div class="app hidden" id="mainApp">
+        <!-- Header -->
+        <div class="header">
+            <div class="week-navigation">
+                <button class="nav-btn" onclick="changeWeek(-1)">⬅️ Semana Anterior</button>
+                <div class="week-title" id="weekTitle">📅 Semana del 13-19 Enero 2025</div>
+                <button class="nav-btn" onclick="changeWeek(1)">Semana Siguiente ➡️</button>
+            </div>
+            
+            <div class="quick-buttons">
+                <button class="quick-btn work" onclick="quickAdd('work')">💼 Trabajo IA</button>
+                <button class="quick-btn gym" onclick="quickAdd('gym')">💪 Gimnasio</button>
+                <button class="quick-btn study" onclick="quickAdd('study')">📚 Estudio</button>
+                <button class="quick-btn meal" onclick="quickAdd('meal')">🍽️ Meal Prep</button>
+                <button class="quick-btn sleep" onclick="quickAdd('sleep')">😴 Sueño</button>
+                <button class="quick-btn clean" onclick="quickAdd('clean')">🧹 Limpieza</button>
+                <button class="quick-btn free" onclick="quickAdd('free')">🎯 Tiempo Libre</button>
+                <button class="quick-btn audio" onclick="quickAdd('audio')">🎵 Audio/Música</button>
+            </div>
 
-  <dialog id="editor">
-    <form method="dialog" id="form">
-      <div class="modal-head">
-        <strong>Nuevo / Editar bloque</strong>
-        <button id="closeModal" class="btn-ghost" value="cancel">Cerrar</button>
-      </div>
-      <div class="row2" style="margin-bottom:10px">
-        <select class="select" id="type">
-          <option value="work">Trabajo / Reunión IA</option>
-          <option value="gym">Gimnasio</option>
-          <option value="study">Estudio</option>
-          <option value="sleep">Sueño</option>
-          <option value="meal">Meal prep</option>
-          <option value="clean">Organización / limpieza</option>
-          <option value="free">Tiempo libre</option>
-        </select>
-        <input class="text" id="titleInput" placeholder="Título (opcional)" />
-      </div>
-      <div class="row2">
-        <select class="select" id="day">
-          <option value="0">Lunes</option>
-          <option value="1">Martes</option>
-          <option value="2">Miércoles</option>
-          <option value="3">Jueves</option>
-          <option value="4">Viernes</option>
-          <option value="5">Sábado</option>
-          <option value="6">Domingo</option>
-        </select>
-        <input class="time" id="start" type="time" value="09:00" step="3600" />
-      </div>
-      <div class="row2">
-        <label class="sr" for="dur">Duración</label>
-        <input class="number" id="dur" type="number" min="1" max="8" value="1" />
-        <div style="display:flex;align-items:center;color:#aab1c2">horas</div>
-      </div>
-      <div class="modal-actions">
-        <button id="del" class="btn-danger" type="button" hidden>Eliminar</button>
-        <button id="save" class="btn btn-neon" value="default">Guardar</button>
-      </div>
-    </form>
-  </dialog>
+            <div class="info-chips">
+                <div class="chip" id="weekInfo">📊 7 días planificados</div>
+                <div class="chip">⚡ Sincronización activa</div>
+                <div class="chip">🎨 Tema neón</div>
+                <div class="chip" id="audioStatus">🔇 Audio: Deshabilitado</div>
+            </div>
+        </div>
 
-  <footer>
-    Atajos: clic en una celda para crear, arrastra un bloque para moverlo, doble clic para editar.
-  </footer>
+        <!-- Calendario -->
+        <div class="calendar-container">
+            <div class="calendar" id="calendar">
+                <!-- Headers -->
+                <div class="time-header">Hora</div>
+                <div class="day-header">Lun</div>
+                <div class="day-header">Mar</div>
+                <div class="day-header">Mié</div>
+                <div class="day-header">Jue</div>
+                <div class="day-header">Vie</div>
+                <div class="day-header">Sáb</div>
+                <div class="day-header">Dom</div>
 
-  <script>
-    /******************** LOGIN SIMPLE ********************/
-    const PASSWORD = "Bunyola20";
-    const gate = document.getElementById('gate');
-    const hint = document.getElementById('hint');
-    const enterBtn = document.getElementById('enter');
-    const pwdInput = document.getElementById('pwd');
+                <!-- Time slots y celdas del calendario se generan dinámicamente -->
+            </div>
+            
+            <!-- Capa de eventos -->
+            <div class="events" id="eventsLayer"></div>
+        </div>
+    </div>
 
-    function unlock(){
-      if(pwdInput.value === PASSWORD){
-        sessionStorage.setItem('calendar_ok','1');
-        gate.style.display='none';
-      } else {
-        hint.textContent = 'Contraseña incorrecta';
-      }
-    }
-    enterBtn.addEventListener('click',unlock);
-    pwdInput.addEventListener('keydown',e=>{ if(e.key==='Enter'){ unlock(); }});
-    if(sessionStorage.getItem('calendar_ok')==='1'){ gate.style.display='none'; }
+    <!-- Modal de edición -->
+    <div class="modal" id="eventModal">
+        <div class="modal-content">
+            <h3 id="modalTitle">Crear Evento</h3>
+            <form id="eventForm">
+                <div class="form-group">
+                    <label>Título:</label>
+                    <input type="text" id="eventTitleInput" required>
+                </div>
+                
+                <div class="form-group">
+                    <label>Día:</label>
+                    <select id="eventDay">
+                        <option value="0">Lunes</option>
+                        <option value="1">Martes</option>
+                        <option value="2">Miércoles</option>
+                        <option value="3">Jueves</option>
+                        <option value="4">Viernes</option>
+                        <option value="5">Sábado</option>
+                        <option value="6">Domingo</option>
+                    </select>
+                </div>
+                
+                <div class="form-group">
+                    <label>Hora inicio:</label>
+                    <select id="eventHour"></select>
+                </div>
+                
+                <div class="form-group">
+                    <label>Duración (horas):</label>
+                    <select id="eventDuration">
+                        <option value="0.5">30 min</option>
+                        <option value="1">1 hora</option>
+                        <option value="1.5">1.5 horas</option>
+                        <option value="2">2 horas</option>
+                        <option value="3">3 horas</option>
+                        <option value="4">4 horas</option>
+                        <option value="8">8 horas</option>
+                    </select>
+                </div>
+                
+                <div class="form-group">
+                    <label>Categoría:</label>
+                    <select id="eventCategory" onchange="toggleAudioOptions()">
+                        <option value="work">💼 Trabajo</option>
+                        <option value="gym">💪 Gimnasio</option>
+                        <option value="study">📚 Estudio</option>
+                        <option value="meal">🍽️ Comida</option>
+                        <option value="sleep">😴 Sueño</option>
+                        <option value="clean">🧹 Limpieza</option>
+                        <option value="free">🎯 Libre</option>
+                        <option value="audio">🎵 Audio/Música</option>
+                    </select>
+                </div>
+                
+                <div class="form-group audio-options" id="audioOptions" style="display: none;">
+                    <label>🎵 Opciones de Audio:</label>
+                    <select id="audioType">
+                        <option value="music">🎶 Música de fondo</option>
+                        <option value="podcast">🎙️ Podcast</option>
+                        <option value="audiobook">📖 Audiolibro</option>
+                        <option value="meditation">🧘 Meditación</option>
+                        <option value="nature">🌿 Sonidos naturales</option>
+                        <option value="focus">🎯 Música de concentración</option>
+                    </select>
+                </div>
+                
+                <div class="form-group audio-options" id="audioUrl" style="display: none;">
+                    <label>🔗 URL de Audio (opcional):</label>
+                    <input type="url" id="audioUrlInput" placeholder="https://ejemplo.com/audio.mp3">
+                    <small style="color: rgba(245, 247, 250, 0.7); font-size: 12px;">
+                        ⚠️ Nota: La reproducción de audio no está disponible por limitaciones técnicas, pero se guardará la referencia.
+                    </small>
+                </div>
+                
+                <div class="modal-buttons">
+                    <button type="button" class="btn btn-secondary" onclick="closeModal()">Cancelar</button>
+                    <button type="button" class="btn btn-danger" id="deleteBtn" onclick="deleteEvent()" style="display: none;">Eliminar</button>
+                    <button type="submit" class="btn btn-primary">Guardar</button>
+                </div>
+            </form>
+        </div>
+    </div>
 
-    /******************** CALENDARIO ********************/
-    const startHour = 6;  // 06:00
-    const endHour   = 23; // 23:00
-    const times = document.getElementById('times');
-    const cols  = document.getElementById('cols');
-    const eventsGrid = document.getElementById('events');
-    const weekLabel = document.getElementById('weekLabel');
+    <!-- Tooltip -->
+    <div class="tooltip" id="tooltip"></div>
 
-    // Generar horas y columnas
-    for(let h=startHour; h<=endHour; h++){
-      const t = document.createElement('div');
-      t.textContent = String(h).padStart(2,'0') + ':00';
-      times.appendChild(t);
-    }
-    for(let d=0; d<7; d++){
-      const col = document.createElement('div');
-      col.className='col';
-      for(let h=startHour; h<=endHour; h++){
-        const cell = document.createElement('div');
-        cell.className='cell';
-        cell.dataset.day=d;
-        cell.dataset.hour=h;
-        cell.title = `Clic para añadir en ${['Lun','Mar','Mié','Jue','Vie','Sáb','Dom'][d]} ${String(h).padStart(2,'0')}:00`;
-        cell.addEventListener('click',()=>openEditor({day:d,start:h+':00',dur:1}));
-        col.appendChild(cell);
-      }
-      cols.appendChild(col);
-    }
+    <script>
+        // Variables globales
+        let EVENTS = JSON.parse(localStorage.getItem('calendarEvents') || '[]');
+        let currentEditingEvent = null;
+        let draggedEvent = null;
+        let currentWeekOffset = 0; // 0 = semana actual, -1 = anterior, +1 = siguiente
 
-    // Semana label
-    const now = new Date();
-    const onejan = new Date(now.getFullYear(),0,1);
-    const week = Math.ceil((((now - onejan) / 86400000) + onejan.getDay()+1) / 7);
-    weekLabel.textContent = `Semana ${week} · ${now.getFullYear()}`;
+        // Verificar acceso
+        function checkAccess() {
+            const password = document.getElementById('passwordInput').value;
+            if (password === 'Bunyola20') {
+                sessionStorage.setItem('calendarAccess', 'granted');
+                document.getElementById('accessGate').classList.add('hidden');
+                document.getElementById('mainApp').classList.remove('hidden');
+                initCalendar();
+            } else {
+                alert('❌ Contraseña incorrecta');
+            }
+        }
 
-    /******************** DATOS ********************/
-    const KEY='calendar_events_v1';
-    let EVENTS = JSON.parse(localStorage.getItem(KEY) || '[]');
+        // Verificar acceso al cargar
+        window.onload = function() {
+            if (sessionStorage.getItem('calendarAccess') === 'granted') {
+                document.getElementById('accessGate').classList.add('hidden');
+                document.getElementById('mainApp').classList.remove('hidden');
+                initCalendar();
+            }
+        };
 
-    function save(){ localStorage.setItem(KEY, JSON.stringify(EVENTS)); }
+        // Inicializar calendario
+        function initCalendar() {
+            generateCalendarGrid();
+            generateHourOptions();
+            updateWeekTitle();
+            renderEvents();
+            setupEventListeners();
+        }
 
-    function toGridRow(hh){ return (parseInt(hh,10) - startHour) + 1; } // +1 porque grid inicia en 1
+        // Actualizar título de semana
+        function updateWeekTitle() {
+            const today = new Date();
+            const currentMonday = new Date(today);
+            currentMonday.setDate(today.getDate() - today.getDay() + 1); // Lunes de esta semana
+            
+            // Ajustar por offset de semana
+            currentMonday.setDate(currentMonday.getDate() + (currentWeekOffset * 7));
+            
+            const sunday = new Date(currentMonday);
+            sunday.setDate(currentMonday.getDate() + 6);
+            
+            const months = ['Enero', 'Febrero', 'Marzo', 'Abril', 'Mayo', 'Junio',
+                          'Julio', 'Agosto', 'Septiembre', 'Octubre', 'Noviembre', 'Diciembre'];
+            
+            const startDay = currentMonday.getDate();
+            const endDay = sunday.getDate();
+            const startMonth = months[currentMonday.getMonth()];
+            const endMonth = months[sunday.getMonth()];
+            const year = currentMonday.getFullYear();
+            
+            let weekText;
+            if (startMonth === endMonth) {
+                weekText = `📅 Semana del ${startDay}-${endDay} ${startMonth} ${year}`;
+            } else {
+                weekText = `📅 Semana del ${startDay} ${startMonth} - ${endDay} ${endMonth} ${year}`;
+            }
+            
+            document.getElementById('weekTitle').textContent = weekText;
+            
+            // Actualizar info chip
+            const weekInfo = document.getElementById('weekInfo');
+            if (currentWeekOffset === 0) {
+                weekInfo.textContent = '📊 Semana actual';
+            } else if (currentWeekOffset < 0) {
+                weekInfo.textContent = `📊 ${Math.abs(currentWeekOffset)} semana(s) atrás`;
+            } else {
+                weekInfo.textContent = `📊 ${currentWeekOffset} semana(s) adelante`;
+            }
+        }
 
-    function render(){
-      eventsGrid.innerHTML='';
-      // asegurar el alto de filas
-      eventsGrid.style.gridAutoRows='56px';
-      for(const ev of EVENTS){
-        const el = document.createElement('div');
-        el.className='event';
-        el.draggable=true;
-        el.dataset.id=ev.id;
-        el.dataset.type=ev.type;
-        el.style.gridColumn = (ev.day+1); // 1..7
-        el.style.gridRow = `${toGridRow(ev.start.split(':')[0])} / span ${ev.dur}`;
-        el.innerHTML = `<div class="title">${ev.title || labelFor(ev.type)}</div><small>${pad(ev.start)} · ${ev.dur}h</small>`;
-        el.addEventListener('dblclick',()=>openEditor(ev));
-        enableDrag(el);
-        eventsGrid.appendChild(el);
-      }
-    }
+        // Cambiar semana
+        function changeWeek(direction) {
+            currentWeekOffset += direction;
+            updateWeekTitle();
+            
+            // Cargar eventos de la semana correspondiente
+            const weekKey = `calendarEvents_week_${currentWeekOffset}`;
+            EVENTS = JSON.parse(localStorage.getItem(weekKey) || '[]');
+            renderEvents();
+        }
 
-    function pad(t){ return /^\d{1}:/.test(t)?'0'+t:t; }
+        // Generar grid del calendario
+        function generateCalendarGrid() {
+            const calendar = document.getElementById('calendar');
+            
+            // Generar slots de tiempo y celdas
+            for (let hour = 6; hour <= 22; hour++) {
+                // Slot de tiempo
+                const timeSlot = document.createElement('div');
+                timeSlot.className = 'time-slot';
+                timeSlot.textContent = `${hour.toString().padStart(2, '0')}:00`;
+                calendar.appendChild(timeSlot);
+                
+                // Celdas de días
+                for (let day = 0; day < 7; day++) {
+                    const dayCell = document.createElement('div');
+                    dayCell.className = 'day-cell';
+                    dayCell.dataset.day = day;
+                    dayCell.dataset.hour = hour;
+                    dayCell.addEventListener('click', () => openModal(day, hour));
+                    calendar.appendChild(dayCell);
+                }
+            }
+        }
 
-    function labelFor(type){
-      return {
-        work:'Trabajo', gym:'Gimnasio', free:'Tiempo libre', study:'Estudio', sleep:'Sueño', meal:'Meal prep', clean:'Organización'
-      }[type] || 'Evento';
-    }
+        // Generar opciones de hora
+        function generateHourOptions() {
+            const hourSelect = document.getElementById('eventHour');
+            for (let hour = 6; hour <= 22; hour++) {
+                const option = document.createElement('option');
+                option.value = hour;
+                option.textContent = `${hour.toString().padStart(2, '0')}:00`;
+                hourSelect.appendChild(option);
+            }
+        }
 
-    /******************** EDITOR ********************/
-    const editor = document.getElementById('editor');
-    const typeSel = document.getElementById('type');
-    const daySel  = document.getElementById('day');
-    const startInp= document.getElementById('start');
-    const durInp  = document.getElementById('dur');
-    const titleInp= document.getElementById('titleInput');
-    const delBtn  = document.getElementById('del');
+        // Renderizar eventos
+        function renderEvents() {
+            const eventsLayer = document.getElementById('eventsLayer');
+            eventsLayer.innerHTML = '';
 
-    let currentId = null;
+            EVENTS.forEach((event, index) => {
+                const eventElement = document.createElement('div');
+                eventElement.className = `event ${event.category}`;
+                eventElement.draggable = true;
+                eventElement.dataset.index = index;
+                
+                // Calcular posición y tamaño
+                const gridRow = event.hour - 5; // Ajuste por header
+                const gridColumn = event.day + 2; // Ajuste por columna de horas
+                const rowSpan = event.duration * 2; // 2 filas por hora (56px cada una)
+                
+                eventElement.style.gridRow = `${gridRow} / span ${rowSpan}`;
+                eventElement.style.gridColumn = gridColumn;
+                
+                let eventContent = `
+                    <div class="event-title">${event.title}</div>
+                    <div class="event-time">${event.hour}:00 - ${event.hour + event.duration}:00</div>
+                `;
+                
+                // Agregar info de audio si es categoría audio
+                if (event.category === 'audio' && event.audioType) {
+                    const audioTypes = {
+                        music: '🎶', podcast: '🎙️', audiobook: '📖',
+                        meditation: '🧘', nature: '🌿', focus: '🎯'
+                    };
+                    const icon = audioTypes[event.audioType] || '🎵';
+                    eventContent += `<div style="font-size: 10px; opacity: 0.8;">${icon} ${event.audioType}</div>`;
+                }
+                
+                eventElement.innerHTML = eventContent;
+                
+                // Event listeners
+                eventElement.addEventListener('dblclick', () => editEvent(index));
+                eventElement.addEventListener('dragstart', handleDragStart);
+                eventElement.addEventListener('dragend', handleDragEnd);
+                
+                eventsLayer.appendChild(eventElement);
+            });
+        }
 
-    function openEditor(base){
-      currentId = base.id || null;
-      typeSel.value = base.type || 'work';
-      daySel.value  = base.day  ?? 0;
-      startInp.value= base.start || '09:00';
-      durInp.value  = base.dur   || 1;
-      titleInp.value= base.title || '';
-      delBtn.hidden = !base.id;
-      editor.showModal();
-    }
+        // Configurar event listeners
+        function setupEventListeners() {
+            // Drag and drop
+            document.addEventListener('dragover', handleDragOver);
+            document.addEventListener('drop', handleDrop);
+            
+            // Form submit
+            document.getElementById('eventForm').addEventListener('submit', saveEvent);
+            
+            // Tooltips
+            document.querySelectorAll('.day-cell').forEach(cell => {
+                cell.addEventListener('mouseenter', showTooltip);
+                cell.addEventListener('mouseleave', hideTooltip);
+            });
+        }
 
-    document.getElementById('form').addEventListener('submit', (e)=>{
-      e.preventDefault();
-      const data = {
-        id: currentId || crypto.randomUUID(),
-        type: typeSel.value,
-        day: Number(daySel.value),
-        start: startInp.value.substring(0,2)+':00',
-        dur: Math.max(1, Math.min(8, Number(durInp.value))),
-        title: titleInp.value.trim()
-      };
-      const idx = EVENTS.findIndex(x=>x.id===data.id);
-      if(idx>=0) EVENTS[idx]=data; else EVENTS.push(data);
-      save();
-      render();
-      editor.close();
-    });
+        // Drag and drop handlers
+        function handleDragStart(e) {
+            draggedEvent = parseInt(e.target.dataset.index);
+            e.target.style.opacity = '0.5';
+        }
 
-    delBtn.addEventListener('click',()=>{
-      if(!currentId) return;
-      EVENTS = EVENTS.filter(x=>x.id!==currentId);
-      save();
-      render();
-      editor.close();
-    });
+        function handleDragEnd(e) {
+            e.target.style.opacity = '1';
+            draggedEvent = null;
+        }
 
-    document.getElementById('closeModal').addEventListener('click',()=>editor.close());
+        function handleDragOver(e) {
+            e.preventDefault();
+        }
 
-    /******************** DRAG & DROP ********************/
-    function enableDrag(el){
-      el.addEventListener('dragstart', (e)=>{
-        e.dataTransfer.setData('text/plain', el.dataset.id);
-        el.classList.add('ghost');
-      });
-      el.addEventListener('dragend', (e)=>{
-        el.classList.remove('ghost');
-      });
-    }
+        function handleDrop(e) {
+            e.preventDefault();
+            const target = e.target.closest('.day-cell');
+            if (target && draggedEvent !== null) {
+                const newDay = parseInt(target.dataset.day);
+                const newHour = parseInt(target.dataset.hour);
+                
+                // Actualizar evento
+                EVENTS[draggedEvent].day = newDay;
+                EVENTS[draggedEvent].hour = newHour;
+                
+                saveToStorage();
+                renderEvents();
+            }
+        }
 
-    // Permite soltar sobre toda la rejilla
-    eventsGrid.addEventListener('dragover', (e)=>{ e.preventDefault(); });
-    eventsGrid.addEventListener('drop', (e)=>{
-      e.preventDefault();
-      const id = e.dataTransfer.getData('text/plain');
-      const rect = eventsGrid.getBoundingClientRect();
-      const x = e.clientX - rect.left;
-      const y = e.clientY - rect.top;
-      const colW = rect.width / 7;
-      const rowH = 56; // fijo
-      let day = Math.min(6, Math.max(0, Math.floor(x / colW)));
-      let row = Math.min(endHour-startHour, Math.max(0, Math.floor(y / rowH)));
-      const hour = startHour + row;
-      const idx = EVENTS.findIndex(ev=>ev.id===id);
-      if(idx>=0){
-        EVENTS[idx].day = day;
-        EVENTS[idx].start = String(hour).padStart(2,'0')+':00';
-        save();
-        render();
-      }
-    });
+        // Modal functions
+        function openModal(day = 0, hour = 9, eventIndex = null) {
+            currentEditingEvent = eventIndex;
+            const modal = document.getElementById('eventModal');
+            const title = document.getElementById('modalTitle');
+            const deleteBtn = document.getElementById('deleteBtn');
+            
+            if (eventIndex !== null) {
+                // Editar evento existente
+                const event = EVENTS[eventIndex];
+                title.textContent = 'Editar Evento';
+                document.getElementById('eventTitleInput').value = event.title;
+                document.getElementById('eventDay').value = event.day;
+                document.getElementById('eventHour').value = event.hour;
+                document.getElementById('eventDuration').value = event.duration;
+                document.getElementById('eventCategory').value = event.category;
+                
+                // Cargar datos de audio si existen
+                if (event.category === 'audio') {
+                    document.getElementById('audioType').value = event.audioType || 'music';
+                    document.getElementById('audioUrlInput').value = event.audioUrl || '';
+                }
+                
+                toggleAudioOptions();
+                deleteBtn.style.display = 'inline-block';
+            } else {
+                // Crear nuevo evento
+                title.textContent = 'Crear Evento';
+                document.getElementById('eventForm').reset();
+                document.getElementById('eventDay').value = day;
+                document.getElementById('eventHour').value = hour;
+                deleteBtn.style.display = 'none';
+            }
+            
+            modal.style.display = 'flex';
+        }
 
-    /******************** BOTONES RÁPIDOS ********************/
-    document.querySelectorAll('[data-quick]').forEach(btn=>{
-      btn.addEventListener('click',()=>{
-        const type = btn.dataset.quick;
-        openEditor({type, day:new Date().getDay()-1, start:'09:00', dur:(type==='sleep'?8:1), title:''});
-      });
-    });
+        function closeModal() {
+            document.getElementById('eventModal').style.display = 'none';
+            currentEditingEvent = null;
+        }
 
-    /******************** EXPORT & CLEAR ********************/
-    document.getElementById('export').addEventListener('click',()=>{
-      const data = JSON.stringify(EVENTS, null, 2);
-      const blob = new Blob([data], {type:'application/json'});
-      const a = document.createElement('a');
-      a.href = URL.createObjectURL(blob);
-      a.download = 'calendario-semanal.json';
-      a.click();
-      URL.revokeObjectURL(a.href);
-    });
+        function editEvent(index) {
+            const event = EVENTS[index];
+            openModal(event.day, event.hour, index);
+        }
 
-    document.getElementById('clear').addEventListener('click',()=>{
-      if(confirm('¿Eliminar todos los bloques de esta semana?')){
-        EVENTS = [];
-        save();
-        render();
-      }
-    });
+        function saveEvent(e) {
+            e.preventDefault();
+            
+            const eventData = {
+                title: document.getElementById('eventTitleInput').value,
+                day: parseInt(document.getElementById('eventDay').value),
+                hour: parseInt(document.getElementById('eventHour').value),
+                duration: parseFloat(document.getElementById('eventDuration').value),
+                category: document.getElementById('eventCategory').value
+            };
+            
+            // Agregar datos de audio si es categoría audio
+            if (eventData.category === 'audio') {
+                eventData.audioType = document.getElementById('audioType').value;
+                eventData.audioUrl = document.getElementById('audioUrlInput').value;
+            }
+            
+            if (currentEditingEvent !== null) {
+                EVENTS[currentEditingEvent] = eventData;
+            } else {
+                EVENTS.push(eventData);
+            }
+            
+            saveToStorage();
+            renderEvents();
+            closeModal();
+        }
 
-    // Inicializar
-    render();
-  </script>
-</body>
+        function deleteEvent() {
+            if (currentEditingEvent !== null) {
+                EVENTS.splice(currentEditingEvent, 1);
+                saveToStorage();
+                renderEvents();
+                closeModal();
+            }
+        }
+
+        // Toggle audio options
+        function toggleAudioOptions() {
+            const category = document.getElementById('eventCategory').value;
+            const audioOptions = document.querySelectorAll('.audio-options');
+            
+            if (category === 'audio') {
+                audioOptions.forEach(option => option.style.display = 'block');
+            } else {
+                audioOptions.forEach(option => option.style.display = 'none');
+            }
+        }
+
+        // Quick add functions
+        function quickAdd(category) {
+            const presets = {
+                work: { title: 'Trabajo IA', duration: 1 },
+                gym: { title: 'Gimnasio', duration: 1.5 },
+                study: { title: 'Estudio', duration: 2 },
+                meal: { title: 'Meal Prep', duration: 1 },
+                sleep: { title: 'Sueño', duration: 8 },
+                clean: { title: 'Limpieza', duration: 1 },
+                free: { title: 'Tiempo Libre', duration: 2 },
+                audio: { title: 'Sesión de Audio', duration: 1 }
+            };
+            
+            const preset = presets[category];
+            openModal(0, 9);
+            
+            // Aplicar preset
+            setTimeout(() => {
+                document.getElementById('eventTitleInput').value = preset.title;
+                document.getElementById('eventDuration').value = preset.duration;
+                document.getElementById('eventCategory').value = category;
+                toggleAudioOptions();
+            }, 100);
+        }
+
+        // Tooltip functions
+        function showTooltip(e) {
+            const tooltip = document.getElementById('tooltip');
+            const day = parseInt(e.target.dataset.day);
+            const hour = parseInt(e.target.dataset.hour);
+            const days = ['Lunes', 'Martes', 'Miércoles', 'Jueves', 'Viernes', 'Sábado', 'Domingo'];
+            
+            tooltip.textContent = `Clic para añadir en ${days[day]} ${hour}:00`;
+            tooltip.style.left = e.pageX + 10 + 'px';
+            tooltip.style.top = e.pageY - 30 + 'px';
+            tooltip.style.opacity = '1';
+        }
+
+        function hideTooltip() {
+            document.getElementById('tooltip').style.opacity = '0';
+        }
+
+        // Storage functions
+        function saveToStorage() {
+            const weekKey = `calendarEvents_week_${currentWeekOffset}`;
+            localStorage.setItem(weekKey, JSON.stringify(EVENTS));
+            
+            // También guardar en la clave general para compatibilidad
+            if (currentWeekOffset === 0) {
+                localStorage.setItem('calendarEvents', JSON.stringify(EVENTS));
+            }
+        }
+
+        // Export function
+        function exportCalendar() {
+            const dataStr = JSON.stringify(EVENTS, null, 2);
+            const dataBlob = new Blob([dataStr], {type: 'application/json'});
+            const url = URL.createObjectURL(dataBlob);
+            const link = document.createElement('a');
+            link.href = url;
+            link.download = 'calendario_semanal.json';
+            link.click();
+        }
+
+        // Keyboard shortcuts
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'Escape') {
+                closeModal();
+            }
+        });
+    </script>
+<script>(function(){function c(){var b=a.contentDocument||a.contentWindow.document;if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'9720d40b539f9600',t:'MTc1NTY4MTc2OC4wMDAwMDA='};var a=document.createElement('script');a.nonce='';a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script></body>
 </html>
